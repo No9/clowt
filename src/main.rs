@@ -18,53 +18,49 @@ async fn fetch_url(url: String, file_name: String) -> Result<()> {
 
 #[tokio::main]
 async fn main() {
+    // *** CONFIRM USAGE
     // Get Files test and training data
-    let questions_test_filename = "./questions_test.csv";
-    let questions_train_filename = "./questions_train.csv";
-    let questions_test_url = "https://raw.github.com/IBM/watson-machine-learning-samples/master/cloud/data/RAG/questions_test.csv";
-    let questions_train_url = "https://raw.github.com/IBM/watson-machine-learning-samples/master/cloud/data/RAG/questions_train.csv";
+    // let questions_test_filename = "./questions_test.csv";
+    // let questions_train_filename = "./questions_train.csv";
+    // let questions_test_url = "https://raw.github.com/IBM/watson-machine-learning-samples/master/cloud/data/RAG/questions_test.csv";
+    // let questions_train_url = "https://raw.github.com/IBM/watson-machine-learning-samples/master/cloud/data/RAG/questions_train.csv";
 
-    if !Path::new(questions_test_filename).exists() {
-        fetch_url(
-            questions_test_url.to_string(),
-            questions_test_filename.to_string(),
-        )
-        .await
-        .unwrap();
-    }
-    if !Path::new(questions_train_filename).exists() {
-        fetch_url(
-            questions_train_url.to_string(),
-            questions_train_filename.to_string(),
-        )
-        .await
-        .unwrap();
-    }
+    // if !Path::new(questions_test_filename).exists() {
+    //     fetch_url(
+    //         questions_test_url.to_string(),
+    //         questions_test_filename.to_string(),
+    //     )
+    //     .await
+    //     .unwrap();
+    // }
+    // if !Path::new(questions_train_filename).exists() {
+    //     fetch_url(
+    //         questions_train_url.to_string(),
+    //         questions_train_filename.to_string(),
+    //     )
+    //     .await
+    //     .unwrap();
+    // }
 
-    // Load files into MmapBytesReaders
-    // let file_test = std::fs::File::open(questions_test_filename).unwrap();
-    // let file_train = std::fs::File::open(questions_train_filename).unwrap();
-    // let file_test = Box::new(file_test) as Box<dyn MmapBytesReader>;
-    // let file_train = Box::new(file_train) as Box<dyn MmapBytesReader>;
-
-    let test_reader = LazyCsvReader::new(questions_test_filename)
-        .with_separator(b',')
-        .has_header(true)
-        .finish()
-        .unwrap();
-    let _training_reader = LazyCsvReader::new(questions_train_filename)
-        .with_separator(b',')
-        .has_header(true)
-        .finish()
-        .unwrap();
-    let out = test_reader
-        .clone()
-        .select([col("*")])
-        .limit(5)
-        .collect()
-        .unwrap();
-    // Query training reader to print data
-    println!("{}", out);
+    // *** CONFIRM USAGE
+    // let test_reader = LazyCsvReader::new(questions_test_filename)
+    //     .with_separator(b',')
+    //     .has_header(true)
+    //     .finish()
+    //     .unwrap();
+    // let _training_reader = LazyCsvReader::new(questions_train_filename)
+    //     .with_separator(b',')
+    //     .has_header(true)
+    //     .finish()
+    //     .unwrap();
+    // let out = test_reader
+    //     .clone()
+    //     .select([col("*")])
+    //     .limit(5)
+    //     .collect()
+    //     .unwrap();
+    // // Query training reader to print data
+    // println!("{}", out);
 
     // Load Knowledge base
     let documents_filename = "./psgs.tsv";
