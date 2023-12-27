@@ -8,5 +8,5 @@ edition = "2021"
 [dependencies]
 polars = { version = "0.35.4", features = ["csv", "lazy"] }
 reqwest = "0.11.23"
-rust-bert = "0.21.0"
+rust-bert = { git = "https://github.com/guillaume-be/rust-bert" }
 tokio = { version = "1", features = ["full"] }

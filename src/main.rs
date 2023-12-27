@@ -4,6 +4,8 @@ use rust_bert::pipelines::sentence_embeddings::{
 };
 use std::io::Cursor;
 use std::path::Path;
+use tokio::task;
+
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 async fn fetch_url(url: String, file_name: String) -> Result<()> {
@@ -50,7 +52,7 @@ async fn main() {
         .has_header(true)
         .finish()
         .unwrap();
-    let training_reader = LazyCsvReader::new(questions_train_filename)
+    let _training_reader = LazyCsvReader::new(questions_train_filename)
         .with_separator(b',')
         .has_header(true)
         .finish()
@@ -89,15 +91,24 @@ async fn main() {
         .unwrap();
     println!("{}", out);
 
-    let model = SentenceEmbeddingsBuilder::remote(SentenceEmbeddingsModelType::AllMiniLmL6V2)
-        .create_model()?;
+    let _res = task::spawn_blocking(move || {
+        let model = SentenceEmbeddingsBuilder::remote(SentenceEmbeddingsModelType::AllMiniLmL6V2)
+            .create_model()
+            .unwrap();
 
-    // Define input
-    let sentences = ["this is an example sentence", "each sentence is converted"];
+        // Define input
+        let sentences = ["this is an example sentence", "each sentence is converted"];
 
-    // Generate Embeddings
-    let embeddings = model.encode(&sentences)?;
-    println!("{embeddings:?}");
+        // Generate Embeddings
+        let embeddings = model.encode(&sentences).unwrap();
+        println!("{embeddings:?}");
+        // Stand-in for compute-heavy work or using synchronous APIs
+        // v.push_str("world");
+        // // Pass ownership of the value back to the asynchronous context
+        // v
+    })
+    .await
+    .unwrap();
 
     // Create an embedding function
     // https://github.com/guillaume-be/rust-bert/blob/1f4d344668232da8e669e7fea1391c8829d5d1e3/examples/sentence_embeddings.rs
