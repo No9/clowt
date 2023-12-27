@@ -85,31 +85,38 @@ async fn main() {
         .unwrap();
     let out = documents
         .clone()
-        .select([col("*")])
-        .limit(5)
+        .with_columns([(col("title") + lit("\n") + col("text")).alias("indextext")])
+        .select([col("indextext")])
+        .limit(1000)
         .collect()
         .unwrap();
     println!("{}", out);
+    let mut sentences: Vec<String> = vec![];
+    let sentence_iter = out["indextext"].utf8().unwrap().into_iter();
 
-    let _res = task::spawn_blocking(move || {
+    for sentence in sentence_iter {
+        sentences.push(sentence.unwrap().to_string());
+    }
+
+    assert!(sentences.len() == 1000);
+
+    let res = task::spawn_blocking(move || {
         let model = SentenceEmbeddingsBuilder::remote(SentenceEmbeddingsModelType::AllMiniLmL6V2)
             .create_model()
             .unwrap();
 
         // Define input
-        let sentences = ["this is an example sentence", "each sentence is converted"];
+        // let sentences = ["this is an example sentence", "each sentence is converted"];
 
         // Generate Embeddings
         let embeddings = model.encode(&sentences).unwrap();
-        println!("{embeddings:?}");
-        // Stand-in for compute-heavy work or using synchronous APIs
-        // v.push_str("world");
         // // Pass ownership of the value back to the asynchronous context
-        // v
+        embeddings
     })
     .await
     .unwrap();
 
+    println!("{res:?}");
     // Create an embedding function
     // https://github.com/guillaume-be/rust-bert/blob/1f4d344668232da8e669e7fea1391c8829d5d1e3/examples/sentence_embeddings.rs
 
